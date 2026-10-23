@@ -1,0 +1,5 @@
+/private/*.sqlite*
+/private/*.json
+/private/*.lock
+/private/config.php
+/private/sessions/

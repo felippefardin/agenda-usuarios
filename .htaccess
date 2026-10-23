@@ -1,0 +1,4 @@
+Options -Indexes
+<FilesMatch "^(core|smtp|holidays|official-holidays|backup|backup-settings|config)\.php$">
+Require all denied
+</FilesMatch>
