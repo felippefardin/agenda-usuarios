@@ -13,15 +13,23 @@ function db(): PDO {
  CREATE TABLE IF NOT EXISTS attempts(key TEXT PRIMARY KEY, count INTEGER NOT NULL, started INTEGER NOT NULL);
  CREATE TABLE IF NOT EXISTS cache(key TEXT PRIMARY KEY, value TEXT NOT NULL, expires INTEGER NOT NULL);
  CREATE TABLE IF NOT EXISTS local_holidays(id INTEGER PRIMARY KEY, user_id INTEGER REFERENCES users(id), city TEXT NOT NULL, date TEXT NOT NULL, name TEXT NOT NULL, UNIQUE(user_id,city,date,name));');
+ // Migração preserva os registros e seus proprietários.
+ foreach(['users'=>['avatar'=>"TEXT NOT NULL DEFAULT ''"],'events'=>['icon'=>"TEXT NOT NULL DEFAULT 'calendar-event'"],'local_holidays'=>['type'=>"TEXT NOT NULL DEFAULT 'calendario'"]] as $table=>$columns){
+  $existing=array_column($db->query('PRAGMA table_info('.$table.')')->fetchAll(),'name');
+  foreach($columns as $column=>$definition)if(!in_array($column,$existing,true))$db->exec('ALTER TABLE '.$table.' ADD COLUMN '.$column.' '.$definition);
+ }
+ $db->exec('CREATE TABLE IF NOT EXISTS notes(id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, title TEXT NOT NULL, body TEXT NOT NULL DEFAULT "", color TEXT NOT NULL DEFAULT "yellow", created_at TEXT NOT NULL); CREATE INDEX IF NOT EXISTS notes_owner ON notes(user_id); CREATE INDEX IF NOT EXISTS events_owner_dates ON events(user_id,start,end);');
+ $db->exec('CREATE TABLE IF NOT EXISTS positive_views(user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, day TEXT NOT NULL, period TEXT NOT NULL, PRIMARY KEY(user_id,day,period));');
  return $db;
 }
 function query(string $sql, array $params=[]): PDOStatement { $q=db()->prepare($sql);$q->execute($params);return $q; }
 function fail(string $message, int $code=400): never { http_response_code($code);echo json_encode(['error'=>$message],JSON_UNESCAPED_UNICODE);exit; }
 function result(mixed $data=[]): never { echo json_encode($data,JSON_UNESCAPED_UNICODE|JSON_INVALID_UTF8_SUBSTITUTE);exit; }
 function sessionStart(): void {
+ session_name('AGENDA_SESSION');
  $sessions=__DIR__.'/private/sessions';if(!is_dir($sessions))mkdir($sessions,0700,true);session_save_path($sessions);
  ini_set('session.use_strict_mode','1');
- session_set_cookie_params(['httponly'=>true,'samesite'=>'Lax','secure'=>!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS']!=='off']);session_start();
+ session_set_cookie_params(['path'=>rtrim(str_replace('\\','/',dirname($_SERVER['SCRIPT_NAME']??'/')),'/').'/', 'httponly'=>true,'samesite'=>'Lax','secure'=>!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS']!=='off']);session_start();
  $_SESSION['csrf'] ??= bin2hex(random_bytes(24));
 }
 function user(): array {
