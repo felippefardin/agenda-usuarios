@@ -90,3 +90,6 @@ span.date-button{display:inline-flex;align-items:center;justify-content:center}
 
 
 .ui-avatar-heading{grid-column:1/-1;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}.ui-initials{font-family:Arial,sans-serif;font-weight:700;font-size:21px;color:#fff}.ui-blue{background:#0d6eaf}.ui-teal{background:#087f8c}.ui-purple{background:#7554a3}.ui-rose{background:#ad3b63}.ui-orange{background:#a85812}.ui-slate{background:#495970}
+
+/* Alinha o icone e o rotulo do botao Novo post-it. */
+#new-note{display:inline-flex;align-items:center;justify-content:center;gap:6px;line-height:1.25}#new-note>.bi{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;line-height:1;vertical-align:0}#new-note>.bi::before{display:block;line-height:1;vertical-align:0}#new-note>span{margin:0}
