@@ -6,7 +6,7 @@
   {title:'Navegue entre os meses',target:'.toolbar .compact',text:'As setas ao lado do mês mostram o período anterior ou seguinte. Hoje volta ao mês atual. Os três indicadores resumem os compromissos do mês, os prioritários e os concluídos.'},
   {title:'Crie um Novo Registro',target:'#new-event',text:'Clique em Novo Registro. Informe título, início e fim; escolha prioridade e ícone. Local e descrição são opcionais. Clique em Salvar compromisso para gravar. Experimente abaixo: este exemplo não será salvo.',demo:'create'},
   {title:'Edite e reagende',target:'#calendar-wrap',text:'Clique em um compromisso para editar. No computador, arraste o compromisso e solte sobre outra data: os horários e a duração são preservados e a nova data é salva automaticamente. Feriados não podem ser arrastados.',demo:'drag'},
-  {title:'Busque e filtre',target:'.filters',text:'Pesquise pelo título, descrição ou local. Combine Prioridade e Situação para localizar pendências ou concluídos. Se um registro não aparecer, confira o mês e os filtros selecionados.',demo:'filter'},
+  {title:'Filtre seus compromissos',target:'.filters',text:'Combine Prioridade e Situação para localizar pendências ou concluídos. Se um registro não aparecer, confira o mês e os filtros selecionados.',demo:'filter'},
   {title:'Alterne Calendário e Lista',target:'.view-actions',text:'Calendário mostra os registros por dia. Lista mostra primeiro os compromissos e depois os feriados do mês. O botão Editar na lista abre o mesmo formulário de edição.'},
   {title:'Conclua tarefas pendentes',target:'#filter-status',text:'No dia seguinte ao término de um compromisso ainda pendente, a agenda pergunta se ele foi concluído ou deve ser reagendado. Concluída atualiza a situação; Reagendar abre a edição. Você também pode marcar Compromisso concluído ao editar. Use Situação: Concluídos para localizar essas tarefas.',demo:'done'},
   {title:'Entenda os feriados',target:'.optional-filter',text:'As cores identificam os municípios do seu perfil. PF significa ponto facultativo. Use Mostrar pontos facultativos para exibir ou ocultar essas datas. As importações feitas por você ficam na sua conta.'},
@@ -35,8 +35,8 @@
    select('#tour-drag-item').ondragstart=e=>{e.dataTransfer.setData('text/plain','tutorial-example');};select('#tour-drop').ondragover=e=>e.preventDefault();select('#tour-drop').ondrop=e=>{e.preventDefault();if(e.dataTransfer.getData('text/plain')==='tutorial-example')move();};select('#tour-move').onclick=move;
   }
   if(item.demo==='filter'){
-   demo.innerHTML='<label>Pesquise no exemplo<input id="tour-search" placeholder="Digite reunião"></label><div id="tour-search-result" class="tutorial-example" aria-live="polite">Reunião da equipe · Pendente</div>';
-   select('#tour-search').oninput=()=>{select('#tour-search-result').textContent='reunião da equipe'.includes(select('#tour-search').value.toLocaleLowerCase('pt-BR'))?'Reunião da equipe · Pendente':'Nenhum exemplo encontrado. Apague a pesquisa para voltar.';};
+   demo.innerHTML='<label>Situação no exemplo<select id="tour-status"><option value="">Todas</option><option value="0">Pendentes</option><option value="1">Concluídos</option></select></label><div id="tour-filter-result" class="tutorial-example" aria-live="polite">Reunião da equipe · Pendente / Relatório · Concluído</div>';
+   select('#tour-status').onchange=()=>{const status=select('#tour-status').value;select('#tour-filter-result').textContent=status==='0'?'Reunião da equipe · Pendente':status==='1'?'Relatório · Concluído':'Reunião da equipe · Pendente / Relatório · Concluído';};
   }
   if(item.demo==='done'){
    demo.innerHTML='<div class="tutorial-example" id="tour-task">Tarefa de exemplo · Pendente</div><button type="button" id="tour-done">Marcar exemplo como concluído</button><output id="tour-result" aria-live="polite"></output>';

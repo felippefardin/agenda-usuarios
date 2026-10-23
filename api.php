@@ -5,7 +5,7 @@ sessionStart();
 try {
  $a=$_GET['action']??'';$post=$_SERVER['REQUEST_METHOD']==='POST';
  if($post){if(!hash_equals($_SESSION['csrf'],$_SERVER['HTTP_X_CSRF_TOKEN']??''))fail('Atualize a página e tente novamente.',403);$p=json_decode(file_get_contents('php://input'),true);if(!is_array($p))fail('Dados inválidos.');}
- elseif(!in_array($a,['session','positive_message','events','note','notes','overdue_events','cities','holidays','status'],true))fail('Método não permitido.',405);
+ elseif(!in_array($a,['session','avatar_image','positive_message','events','note','notes','overdue_events','cities','holidays','status'],true))fail('Método não permitido.',405);
  if($a==='session'){ $u=null;if(isset($_SESSION['uid']))$u=publicUser(user());result(['csrf'=>$_SESSION['csrf'],'user'=>$u,'network'=>$config['base_url']]); }
  if($a==='register'){
  limit('register:'.($_SERVER['REMOTE_ADDR']??''),15);
@@ -37,6 +37,7 @@ try {
  query('UPDATE users SET password=?,version=version+1 WHERE id=?',[password_hash($pw,PASSWORD_DEFAULT),$r['user_id']]);query('DELETE FROM resets WHERE user_id=?',[$r['user_id']]);db()->commit();result(['message'=>'Senha atualizada. Entre novamente.']);
  }
  $u=user();
+ if($a==='avatar_image'){require __DIR__.'/private/ui-avatar.php';outputUiAvatar($u);}
  if($a==='positive_message'){
  require __DIR__.'/private/motivation.php';$period=positivePeriod((int)date('G'));$day=date('Y-m-d');
  if(query('SELECT 1 FROM positive_views WHERE user_id=? AND day=? AND period=?',[$u['id'],$day,$period])->fetch())result(['available'=>false]);
@@ -50,7 +51,7 @@ try {
  if($a==='profile'){
  $email=trim($p['email']??'');$name=clean($p['name']??'');if(!$name || !filter_var($email,FILTER_VALIDATE_EMAIL) || strlen($email)>200)fail('Informe nome e e-mail válido.');
  if(strtolower($email)!==strtolower($u['email']) && !password_verify($p['current_password']??'',$u['password']))fail('Para alterar o e-mail, informe sua senha atual.');
- $avatar=$p['avatar']??$u['avatar'];if($avatar!==''&&!preg_match('/^avatar-(?:[1-9]|1[0-2])$/D',$avatar))fail('Avatar inválido.');
+ $avatar=$p['avatar']??$u['avatar'];if($avatar!==''&&!preg_match('/^(?:avatar-(?:[1-9]|1[0-2])|ui-(?:blue|teal|purple|rose|orange|slate))$/D',$avatar))fail('Avatar inválido.');
  $cities=$p['cities']??[];if(!is_array($cities) || count($cities)>30)fail('Selecione até 30 municípios.');$valid=[];
  foreach($cities as $c){$id=(string)($c['id']??'');if(!preg_match('/^\d{7}$/',$id))fail('Município inválido.');$url=trim($c['ics_url']??'');if($url!=='' && !preg_match('~^https://calendar\.google\.com/calendar/ical/[a-zA-Z0-9@%._+\-]+/public/basic\.ics$~D',$url))fail('Use o endereço público ICS do Google Agenda: https://calendar.google.com/calendar/ical/.../public/basic.ics');$valid[$id]=['id'=>$id,'name'=>clean($c['name']??'',100),'ics_url'=>$url,'color'=>cityColor($c,count($valid))];}
  try{query('UPDATE users SET name=?,email=?,cpf=?,registration=?,phone=?,department=?,cities=?,avatar=? WHERE id=?',[$name,$email,clean($p['cpf']??'',20),clean($p['registration']??'',50),clean($p['phone']??'',30),clean($p['department']??'',120),json_encode(array_values($valid)), $avatar, $u['id']]);}catch(PDOException $e){if($e->getCode()==='23000')fail('E-mail já cadastrado.');throw $e;}
