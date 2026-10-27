@@ -2,6 +2,7 @@
 declare(strict_types=1);
 date_default_timezone_set('America/Sao_Paulo');
 $config = require __DIR__.'/private/config.php';
+require_once __DIR__.'/agenda-features.php';
 function db(): PDO {
  static $db;
  if ($db) return $db;
@@ -20,6 +21,7 @@ function db(): PDO {
  }
  $db->exec('CREATE TABLE IF NOT EXISTS notes(id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, title TEXT NOT NULL, body TEXT NOT NULL DEFAULT "", color TEXT NOT NULL DEFAULT "yellow", created_at TEXT NOT NULL); CREATE INDEX IF NOT EXISTS notes_owner ON notes(user_id); CREATE INDEX IF NOT EXISTS events_owner_dates ON events(user_id,start,end);');
  $db->exec('CREATE TABLE IF NOT EXISTS positive_views(user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, day TEXT NOT NULL, period TEXT NOT NULL, PRIMARY KEY(user_id,day,period));');
+ agendaSchema($db);
  return $db;
 }
 function query(string $sql, array $params=[]): PDOStatement { $q=db()->prepare($sql);$q->execute($params);return $q; }
