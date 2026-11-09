@@ -3,3 +3,6 @@
 /private/*.lock
 /private/config.php
 /private/sessions/
+
+/client_secret_*.json
+/private/mail-config.php

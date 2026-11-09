@@ -1,0 +1,17 @@
+.trash-item,.reminder-item { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.75rem 0; border-bottom:1px solid #d8e1e8; }
+.trash-item span,.reminder-item span { overflow-wrap:anywhere; }
+.reminder-panel { padding:1rem; margin:1rem 0; border:1px solid #9bbfce; border-radius:.75rem; }
+
+/* Ferramentas da agenda */
+.agenda-tools{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:16px 18px;margin:18px 0;background:var(--soft);border:1px solid var(--border);border-radius:12px}
+.agenda-tools-heading{display:flex;flex-direction:column;gap:2px;min-width:190px;margin-right:auto}.agenda-tools-heading strong{font-size:calc(14px * var(--text-scale,1));color:var(--ink)}.agenda-tools-heading span,.agenda-tools-hint{font-size:calc(12px * var(--text-scale,1));color:var(--muted)}.agenda-tools-actions{display:flex;flex-wrap:wrap;gap:8px}.agenda-tools-actions button{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:9px 13px;background:var(--card);white-space:normal}.agenda-tools-hint{flex-basis:100%;display:flex;align-items:center;gap:7px}.agenda-tools-hint .bi{color:var(--accent)}
+@media(max-width:700px){.agenda-tools{padding:14px;gap:12px}.agenda-tools-heading{width:100%}.agenda-tools-actions{width:100%}.agenda-tools-actions button{flex:1 1 auto}}
+
+/* Alinhamento dos campos do compromisso. */
+#event-form .form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-items: stretch; }
+#event-form .form-row > label { display: flex; flex-direction: column; justify-content: flex-end; min-width: 0; }
+#event-form input:not([type="hidden"]):not([type="checkbox"]),
+#event-form select { min-height: 46px; height: 46px; width: 100%; }
+@media (max-width: 480px) {
+  #event-form .form-row { grid-template-columns: minmax(0, 1fr); gap: 0; }
+}

@@ -36,7 +36,7 @@ async function loadAgenda(){
  }).catch(e=>{if(id===loadId){$('#holiday-warnings').textContent='Não foi possível atualizar os feriados. Seus compromissos continuam disponíveis. '+e.message;$('#holiday-warnings').hidden=false;}});
  await Promise.all([eventRequest,holidayRequest]);if(id===loadId)$('#loading').hidden=true;
 }
-function filtered(){const p=$('#filter-priority').value,s=$('#filter-status').value;return events.filter(e=>(!p||e.priority===p)&&(s===''||String(Number(e.done))===s));}
+function filtered(){return events;}
 function shownHolidays(){return holidays.filter(h=>$('#show-optional').checked||h.type!=='facultativo');}
 function holidayType(h){return ({facultativo:'Ponto facultativo',municipal:'Feriado municipal',estadual:'Feriado estadual',nacional:'Feriado nacional',calendario:'Calendário não verificado'})[h.type]||'Calendário não verificado';}
 function render(){
@@ -79,8 +79,8 @@ const resetToken=new URLSearchParams(location.search).get('reset');bindForm('#re
 $('#copy-network').onclick=async()=>{try{await navigator.clipboard.writeText($('#network-url').textContent);toast('Link copiado.');}catch{const range=document.createRange();range.selectNodeContents($('#network-url'));window.getSelection().removeAllRanges();window.getSelection().addRange(range);toast('Link selecionado. Pressione Ctrl+C para copiar.');}};
 $('#nav-profile').onclick=()=>switchView(true);$('#nav-agenda').onclick=()=>switchView(false);$('#new-event').onclick=()=>openEvent();
 $('#prev').onclick=()=>{month.setMonth(month.getMonth()-1);loadAgenda();};$('#next').onclick=()=>{month.setMonth(month.getMonth()+1);loadAgenda();};$('#today').onclick=()=>{month=new Date(new Date().getFullYear(),new Date().getMonth(),1);loadAgenda();};
-$('#view-list').onclick=()=>{listMode=true;render();loadAgenda();};$('#view-month').onclick=()=>{listMode=false;render();};for(const s of ['#filter-priority','#filter-status'])$(s).addEventListener('change',render);
-bindForm('#event-form',async(p,f)=>{p.done=f.elements.done.checked;const saved=await api('save_event',p);if(!saved.event?.id)throw Error('O servidor não confirmou o registro. Atualize a página antes de tentar novamente.');const [y,m]=saved.event.start.slice(0,7).split('-').map(Number);month=new Date(y,m-1,1);$('#filter-priority').value='';$('#filter-status').value='';$('#event-dialog').close();toast('Compromisso salvo com sucesso.');await loadAgenda();});
+$('#view-list').onclick=()=>{listMode=true;render();loadAgenda();};$('#view-month').onclick=()=>{listMode=false;render();};
+bindForm('#event-form',async(p,f)=>{p.done=f.elements.done.checked;const saved=await api('save_event',p);if(!saved.event?.id)throw Error('O servidor não confirmou o registro. Atualize a página antes de tentar novamente.');const [y,m]=saved.event.start.slice(0,7).split('-').map(Number);month=new Date(y,m-1,1);$('#event-dialog').close();toast('Compromisso salvo com sucesso.');await loadAgenda();});
 $('#delete-event').onclick=async()=>{if(!confirm('Remover este compromisso?'))return;try{await api('delete_event',{id:$('#event-form').elements.id.value});$('#event-dialog').close();toast('Compromisso removido.');await loadAgenda();}catch(e){toast(e.message,true);}};
 bindForm('#profile',async p=>{const r=await api('profile',{...p,cities});me=r.user;fillProfile();updateHeader();toast('Perfil salvo com sucesso. Seus municípios e cores foram atualizados.');loadAgenda();});
 bindForm('#change-password',async(p,f)=>{await api('password',p);f.reset();toast('Senha atualizada.');});
